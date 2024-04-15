@@ -17,11 +17,14 @@ enum errors {
 typedef struct {
   char username[100];
   char hash[65];
+  int num_users;
 } User;
 
 int readWordsFromFile(char ***words_ptr, int *num_words_ptr);
 int readCSV(const char *filename, User *users);
 void freeWords(char **words, int num_words);
+int findMatchingHash(char *hash, User *users);
+int compareHashes(char **words, User *users);
 
 int main() {
   char **words;
@@ -37,9 +40,9 @@ int main() {
     return EXIT_FAILURE;
   }
 
-  for (int i = 0; i < 10; ++i) {
-    printf("User: %s, Hash: %s\n", users[i].username, users[i].hash);
-  }
+  // for (int i = 0; i < 10; ++i) {
+  //   printf("User: %s, Hash: %s\n", users[i].username, users[i].hash);
+  // }
 
   // for (int i = 0; i < 10; ++i) {
   //   printf("%s\n", words[i]);
@@ -47,9 +50,9 @@ int main() {
   // printf("words num: %d\n", num_words);
   // printf("last word: %s\n", words[num_words - 1]);
 
-  // compareHashes(words);
+  compareHashes(words, users);
 
-  // freeWords(words, num_words);
+  freeWords(words, num_words);
   return EXIT_SUCCESS;
 }
 
@@ -99,38 +102,26 @@ void freeWords(char **words, int num_words) {
   return;
 }
 
-int compareHashes(char **input) {
+int compareHashes(char **words, User *users) {
   //? Schedule static by default, try dinamic later
 #pragma omp parallel for num_threads(MAX_THREADS)
   for (int i = 0; i < 10 /*len(input)*/; ++i) {
     char output[65];
-    sha256(input[i], output);
-    // int user_index = findMatchingHash(output, users, num_users);
-    // if (user_index != -1) {
-    //   printf("Hash encontrado para la palabra \"%s\": Usuario %s\n",
-    //   input[i],
-    //          users[user_index].username);
-    // }
+    sha256(words[i], output);
+    int num_user = findMatchingHash(output, users);
+    if (num_user != -1) {
+      printf("Se encontro la contraseña %s para el usuario %s\n", words[i],
+             users[num_user].username);
+    }
   }
   return 0;
 }
 
-void sha256(const char *input, char outputBuffer[65]) {
-  unsigned char hash[SHA256_DIGEST_LENGTH];
-  SHA256_CTX sha256;
-  SHA256_Init(&sha256);
-  SHA256_Update(&sha256, input, strlen(input));
-  SHA256_Final(hash, &sha256);
-  for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
-    sprintf(outputBuffer + (i * 2), "%02x", hash[i]);
-  }
-  outputBuffer[64] = 0;
-}
-
-int findMatchingHash(char *hash, User *users, int num_users) {
-  for (int i = 0; i < num_users; i++) {
-    if (strcmp(hash, users[i].hash) == 0) {
-      return i;
+int findMatchingHash(char *hash, User *users) {
+  for (int num_user = 0; num_user < users->num_users; ++num_user) {
+    // printf("trying to match %s with %s\n", hash, users[i].hash);
+    if (strcmp(hash, users[num_user].hash) == 0) {
+      return num_user;
     }
   }
   return -1;
@@ -164,6 +155,19 @@ int readCSV(const char *filename, User *users) {
     strcpy(users[num_user].hash, hash);
     ++num_user;
   }
+  users->num_users = num_user;
   fclose(file);
   return EXIT_SUCCESS;
+}
+
+void sha256(const char *input, char outputBuffer[65]) {
+  unsigned char hash[SHA256_DIGEST_LENGTH];
+  SHA256_CTX sha256;
+  SHA256_Init(&sha256);
+  SHA256_Update(&sha256, input, strlen(input));
+  SHA256_Final(hash, &sha256);
+  for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
+    sprintf(outputBuffer + (i * 2), "%02x", hash[i]);
+  }
+  outputBuffer[64] = 0;
 }
