@@ -108,7 +108,8 @@ int compareHashes(char **words, User *users, int num_words, int start_index,
         int num_user = findMatchingHash(output, users);
         if (num_user != -1) {
           printPasswordInfo(combined, users, num_user, i, j, k, num_words);
-          fprintf(file, "%s: %s\n", users[num_user].username, combined);
+          fprintf(file, "%s: %s -> i: %d, j: %d, k: %d \n",
+                  users[num_user].username, combined, i, j, k);
         }
       }
     }
@@ -122,15 +123,12 @@ void printPasswordInfo(char *combined, User *users, int num_user, int i, int j,
                        int k, int num_words) {
   printf("The password was found: %s for the user: %s\n", combined,
          users[num_user].username);
-  printf("Tries: %d\n", i * num_words * num_words + j * num_words + k);
   if (k != -1) {
-    printf("Remaining tries: %d\n", num_words * num_words * num_words -
-                                        i * num_words * num_words -
-                                        j * num_words - k);
+    printf("Tries: %d\n", i * num_words * num_words + j * num_words + k);
   } else {
-    printf("Remaining tries: %d\n", num_words * num_words - i * num_words - j);
+    printf("Tries: %d\n", i * num_words + j);
   }
-  // Indexes of the words that form the password
+
   printf("Indexes: i: %d, j: %d, k: %d\n", i, j, k);
 }
 
