@@ -87,16 +87,18 @@ int compareHashes(char **words, User *users, int num_words, int start_index,
         if (num_user != -1) {
           printPasswordInfo(combined, users, num_user, i, j, -1, num_words);
           fprintf(file, "%s: %s\n", users[num_user].username, combined);
+          fflush(file);
         }
       }
     }
+    printf("\nStage 2 finished\n\n");
   }
-  printf("\nStage 2 finished\n\n");
   printf("Starting Stage 3. start: %d, end: %d\n", start_index, end_index);
 
   // Hash combinations of three words and compare with users hashes
 #pragma omp parallel for num_threads(MAX_THREADS)
   for (int i = start_index; i < end_index; ++i) {
+    printf("Iteration: %d\n", i);
     for (int j = 0; j < num_words; ++j) {
       for (int k = 0; k < num_words; ++k) {
         char output[65];
@@ -110,6 +112,7 @@ int compareHashes(char **words, User *users, int num_words, int start_index,
           printPasswordInfo(combined, users, num_user, i, j, k, num_words);
           fprintf(file, "%s: %s -> i: %d, j: %d, k: %d \n",
                   users[num_user].username, combined, i, j, k);
+          fflush(file);
         }
       }
     }

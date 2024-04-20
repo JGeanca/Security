@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra -pedantic -std=c99 -fopenmp -Wno-deprecated-declarations
 LIBS = -lcrypto
 
-SRC = hash_comparer_v2.c
+SRC = hash_comparer_with_indexes.c
 
 all: program
 

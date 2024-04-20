@@ -12,7 +12,7 @@ def distribute_indices(num_indices, num_computers):
     return indices
 
 if __name__ == "__main__":
-    num_indices = 100000
+    num_indices = 1000000
     num_computers = int(input("Ingrese la cantidad de computadoras disponibles: "))
 
     if num_computers <= 0:
