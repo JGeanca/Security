@@ -210,7 +210,7 @@ int getArgs(int argc, char *argv[], int *start_index, int *end_index,
 }
 
 int readWordsFromFile(char ***words_ptr, int *num_words_ptr) {
-  const char url[] = "xato-net-10-million-passwords-1000000.txt";
+  const char url[] = "posibles_w.txt";
 
   char word[WORD_SIZE];
   char **words = malloc(NUM_WORDS * sizeof(char *));
